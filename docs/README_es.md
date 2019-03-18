@@ -5,6 +5,10 @@ Tripter es una app para dividir facilmente gastos compartidos de tus viajes, pre
 
 Una descripción detallada de lo que la aplicación debe permitir realizar y su alcance actual puede ser encontrada [aquí](./REQUERIMIENTOS_FUNCIONALES.md).
 
+## Diagrama de clases
+
+Una posible representación en UML (actualmente un borrador) puede ser encontrada [aquí](./docs/uml_diagram.jpg).
+
 ## Veriones en otros idiomas
 
 La versión en inglés de este documento está disponible [aquí](../README.md).

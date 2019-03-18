@@ -5,6 +5,10 @@ Triper is an app to easily divide shared expenses of your trips, lend money and 
 
 A detailed explanation of what the app should allow and it's current scope can be found [here](./docs/REQUIREMENTS.md).
 
+## Suggested UML Draft
+
+A suggested UML draft can be found [here](./docs/uml_diagram.jpg)
+
 ## Available Translations
 
 The spanish version of the readme is available [here](./docs/README_es.md).
