@@ -7,7 +7,7 @@ Se desea realizar una aplicación que permita administrar gastos compartidos ent
 La misma debe permitir a un usuario crear un viaje del cual será organizador, y dentro del mismo agregar a los viajeros que desee. Un viaje debe tener un nombre o título, una fecha de inicio, y opcionalmente una fecha de fin.
 
 ### Registración de usuarios
-Todo usuario de la aplicación (tanto organizador como viajero) deberá haberse registrado previamente. <Complete with what data is necesary>
+Todo usuario de la aplicación (tanto organizador como viajero) deberá haberse registrado previamente. Para la registración, un usuario debe indicar su nombre y apellido, un email y una contraseña.
 
 ### Carga de gastos
 Un usuario debe poder agregar gastos para los viajes de los que forme parte. Para cada gasto deberá indicarse el monto total, la categoría a la que pertenece, la forma en que se dividirá el mismo, y los viajeros involucrados, junto con cuánto pagó cada uno. La aplicación debe permitir dividir el gasto de las tres siguientes formas: 
