@@ -6,7 +6,7 @@ The application wanted should allow managing of shared expenses between a group 
 ### Trips
 It should allow a user to create a trip, making him the trip's organizer, and add fellow travelers to it. A trip must have a name or title, a starting date and optionally an end date.
 
-### User Registration¡
+### User Registration
 Every app's user (both organizers and travelers) must have registered previously. <Complete with what data is necesary>
 
 ### Expenses
