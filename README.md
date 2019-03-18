@@ -7,7 +7,7 @@ A detailed explanation of what the app should allow and it's current scope can b
 
 ## Suggested UML Draft
 
-A suggested UML draft can be found [here](./docs/uml_diagram.jpg)
+A suggested UML draft can be found [here](./docs/uml_diagram.pdf)
 
 ## Available Translations
 

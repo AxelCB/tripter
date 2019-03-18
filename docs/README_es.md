@@ -7,7 +7,7 @@ Una descripción detallada de lo que la aplicación debe permitir realizar y su 
 
 ## Diagrama de clases
 
-Una posible representación en UML (actualmente un borrador) puede ser encontrada [aquí](./docs/uml_diagram.jpg).
+Una posible representación en UML (actualmente un borrador) puede ser encontrada [aquí](./docs/uml_diagram.pdf).
 
 ## Veriones en otros idiomas
 
