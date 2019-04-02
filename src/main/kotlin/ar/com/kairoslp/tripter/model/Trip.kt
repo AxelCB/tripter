@@ -3,12 +3,16 @@ package ar.com.kairoslp.tripter.model
 import ar.com.kairoslp.tripter.model.account.UserAccountForTrip
 import ar.com.kairoslp.tripter.model.expense.Expense
 import java.util.*
+import javax.persistence.*
 
-class Trip(var title: String, var startDate: Date, var organizer: User, var endDate: Date? = null) {
-
-    var userAccountsForTrip: List<UserAccountForTrip> = ArrayList()
-    var expenses: List<Expense> = ArrayList()
-
+@Entity
+class Trip(var title: String,
+           var startDate: Date,
+           @ManyToOne var organizer: User,
+           var endDate: Date? = null,
+           @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "trip") var userAccountsForTrip: MutableList<UserAccountForTrip> = ArrayList(),
+           @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "trip") var expenses: MutableList<Expense> = ArrayList(),
+           @Id @GeneratedValue val id: Long? = null) {
 
     fun getTravelers(): List<User> {
         return this.userAccountsForTrip.map(UserAccountForTrip::user)
@@ -16,11 +20,12 @@ class Trip(var title: String, var startDate: Date, var organizer: User, var endD
 
     fun addTraveler(user: User) {
         val userAccountForTrip = UserAccountForTrip(user,this)
-        this.userAccountsForTrip += userAccountForTrip
+        this.userAccountsForTrip.add(userAccountForTrip)
         user.joinTrip(userAccountForTrip)
     }
 
     fun addExpense(expense: Expense) {
-        this.expenses += expense
+        this.expenses.add(expense)
     }
+
 }

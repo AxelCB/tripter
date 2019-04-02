@@ -9,7 +9,7 @@ class ExpenseEquallySplitStrategy: ExpenseSplitStrategy {
     override fun splitExpenseBetween(expense: Expense, users: List<User>) {
         users.forEach {
             val userAccount = it.getAccountFor(expense.trip)
-            val expenseDebt = ExpenseDebt(expense.cost.divide(BigDecimal(users.size), BigDecimal.ROUND_HALF_EVEN), userAccount)
+            val expenseDebt = ExpenseDebt(expense.cost.divide(BigDecimal(users.size), BigDecimal.ROUND_HALF_EVEN), userAccount, expense)
             expense.addExpenseDebt(expenseDebt)
             userAccount.addMovement(expenseDebt)
 

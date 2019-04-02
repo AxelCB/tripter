@@ -5,11 +5,17 @@ import ar.com.kairoslp.tripter.model.User
 import java.math.BigDecimal
 import ar.com.kairoslp.tripter.model.account.ExpenseDebt
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
+import javax.persistence.*
 
-class Expense(var cost: BigDecimal, var category: String, var payments: List<ExpensePayment>,//Non-persistent
-              var strategy: ExpenseSplitStrategy, var trip: Trip, debts: List<ExpenseDebt>?) {
+@Entity
+class Expense(var cost: BigDecimal, var category: String,
+              @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "expense") var payments: MutableList<ExpensePayment>,
+              //Non-persistent
+              @Transient var strategy: ExpenseSplitStrategy,
+              @ManyToOne var trip: Trip,
+              @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "expense") var debts: MutableList<ExpenseDebt> = ArrayList(),
+              @Id @GeneratedValue val id: Long? = null) {
 
-    var debts: List<ExpenseDebt> = debts ?: ArrayList()
 
     init {
         trip.addExpense(this)
@@ -20,6 +26,6 @@ class Expense(var cost: BigDecimal, var category: String, var payments: List<Exp
     }
 
     fun addExpenseDebt(expenseDebt: ExpenseDebt) {
-        this.debts += expenseDebt
+        this.debts.add(expenseDebt)
     }
 }
