@@ -26,7 +26,7 @@ class TravelerNetworkService(@Autowired var travelerNetworkRepository: TravelerN
     fun initializeTravelerNetwork() {
         val travelerNetworkAmount = this.travelerNetworkRepository.count()
         if (travelerNetworkAmount == 1L) {
-            travelerNetwork = this.travelerNetworkRepository.findAll().get(0)
+            travelerNetwork = this.travelerNetworkRepository.findAll()[0]
         } else if (travelerNetworkAmount == 0L) {
             travelerNetwork = this.travelerNetworkRepository.save(TravelerNetwork())
         } else {
