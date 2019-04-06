@@ -5,14 +5,13 @@ import ar.com.kairoslp.tripter.model.User
 import ar.com.kairoslp.tripter.persistence.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
-
-import java.util.*
-import javax.transaction.Transactional
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.MissingServletRequestParameterException
+import java.time.LocalDate
+import javax.transaction.Transactional
 
 @Service
 class UserService(@Autowired val travelerNetworkService: TravelerNetworkService, @Autowired val passwordEncoder: PasswordEncoder, @Autowired val userRepository: UserRepository) {
@@ -27,7 +26,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
 
     @Transactional
     fun organizeTrip(userId: Long, title: String,
-                     startDate: Date, endDate: Date?): Trip {
+                     startDate: LocalDate, endDate: LocalDate?): Trip {
         val user: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
         return user.organizeNewTrip(title, startDate, endDate)
     }
@@ -38,7 +37,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
         val userDetails = SecurityContextHolder.getContext().authentication.principal
         if (userDetails is UserDetails) {
             val loggedInUser: User? = userRepository.findByUsername(userDetails.username)
-            if (loggedInUser?.id != null) {
+            if (loggedInUser != null && loggedInUser.id == null) {
                 throw MissingServletRequestParameterException("Logged in user ID", "Long")
             }
             if (loggedInUser != null)

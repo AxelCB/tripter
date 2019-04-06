@@ -2,14 +2,15 @@ package ar.com.kairoslp.tripter.model
 
 import ar.com.kairoslp.tripter.model.account.UserAccountForTrip
 import ar.com.kairoslp.tripter.model.expense.Expense
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
 
 @Entity
 class Trip(var title: String,
-           var startDate: Date,
+           var startDate: LocalDate,
            @ManyToOne var organizer: User,
-           var endDate: Date? = null,
+           var endDate: LocalDate? = null,
            @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "trip") var userAccountsForTrip: MutableList<UserAccountForTrip> = ArrayList(),
            @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "trip") var expenses: MutableList<Expense> = ArrayList(),
            @Id @GeneratedValue val id: Long? = null) {
