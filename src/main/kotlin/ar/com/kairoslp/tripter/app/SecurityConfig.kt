@@ -17,13 +17,12 @@ class SecurityConfig(@Autowired val userDetailsService: UserDetailsService): Web
     override fun configure(http: HttpSecurity) {
         http
                 .authorizeRequests()
-                .antMatchers("/css/**", "/index", "/user/register").permitAll()
+                .antMatchers("/css/**", "/index", "/user/register", "/**/*swagger*/**", "/v2/api-docs").permitAll()
                 .antMatchers("/traveler/**").hasRole("USER")
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-//        .loginPage("/login").failureUrl("/login-error")
+                .antMatchers("/**").authenticated()
+                .and().formLogin().successForwardUrl("/user/me")
                 .and().csrf().disable()
+
     }
 
     @Autowired

@@ -15,7 +15,7 @@ class UserController(@Autowired val userService: UserService, @Autowired val tra
         return userService.register(firstName, lastName, email, password)
     }
 
-    @GetMapping("/me")
+    @RequestMapping("/me", method = [RequestMethod.GET, RequestMethod.POST])
     fun getUser(): User {
         return userService.getLoggedInUser()
     }
