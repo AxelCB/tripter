@@ -12,7 +12,7 @@ import javax.persistence.*
 class Expense(var cost: BigDecimal, var category: String,
               @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "expense") var payments: MutableList<ExpensePayment>,
         //Non-persistent
-              @Transient var strategy: ExpenseSplitStrategy,
+              @Transient val strategy: ExpenseSplitStrategy,
               @ManyToOne var trip: Trip,
               @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "expense") var debts: MutableList<ExpenseDebt> = ArrayList(),
               @Id @GeneratedValue val id: Long? = null) {
