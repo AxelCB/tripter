@@ -29,4 +29,10 @@ class Trip(var title: String,
         this.expenses.add(expense)
     }
 
+    fun getTravelerAccountByUserId(userId: Long): UserAccountForTrip {
+        return userAccountsForTrip.single { userAccountForTrip ->
+            userAccountForTrip.user.id == userId
+        }
+    }
+
 }
