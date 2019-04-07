@@ -4,7 +4,9 @@ import ar.com.kairoslp.tripter.model.Trip
 import ar.com.kairoslp.tripter.model.User
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
 import ar.com.kairoslp.tripter.model.expense.Expense
+import ar.com.kairoslp.tripter.model.account.Loan
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
+import ar.com.kairoslp.tripter.restful.request.ExpenseUserPaymentRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -45,5 +47,16 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
     fun calculateDebts(tripId: Long, userId: Long): List<DebtResponse> {
         //TODO Calculate user's debts
         return ArrayList()
+    }
+
+    @Transactional
+    fun addLoan(tripId: Long, loanRequest: ExpenseUserPaymentRequest, userId: Long) {
+        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
+        val trip: Trip = loggedInUser.getTripById(tripId)
+
+        val loggedInUserAccount = loggedInUser.getAccountFor(trip)
+        loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, trip.userAccountsForTrip.single { userAccountForTrip ->
+            userAccountForTrip.user.id == loanRequest.userId
+        } ))
     }
 }
