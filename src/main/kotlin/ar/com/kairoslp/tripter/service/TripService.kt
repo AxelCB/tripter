@@ -10,7 +10,7 @@ import ar.com.kairoslp.tripter.model.expense.ExpenseEquallySplitStrategy
 import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByPercentagesStrategy
 import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByValuesStrategy
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
-import ar.com.kairoslp.tripter.restful.request.ExpenseUserPaymentRequest
+import ar.com.kairoslp.tripter.restful.request.UserAmountRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -87,7 +87,7 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
     }
 
     @Transactional
-    fun addLoan(tripId: Long, loanRequest: ExpenseUserPaymentRequest, userId: Long) {
+    fun addLoan(tripId: Long, loanRequest: UserAmountRequest, userId: Long) {
         val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
         val trip: Trip = loggedInUser.getTripById(tripId)
 
@@ -98,7 +98,7 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
     }
 
     @Transactional
-    fun addDebtPayment(tripId: Long, loanRequest: ExpenseUserPaymentRequest, userId: Long) {
+    fun addDebtPayment(tripId: Long, loanRequest: UserAmountRequest, userId: Long) {
         val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
         val trip: Trip = loggedInUser.getTripById(tripId)
 
