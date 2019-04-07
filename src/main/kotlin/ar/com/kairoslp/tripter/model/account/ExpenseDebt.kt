@@ -7,5 +7,5 @@ import javax.persistence.ManyToOne
 
 @Entity
 class ExpenseDebt(amount: BigDecimal,
-                  origin: UserAccountForTrip,
-                  @ManyToOne var expense: Expense): Movement(amount, origin)
+                  origin: UserAccountForTrip, destination: UserAccountForTrip,
+                  @ManyToOne var expense: Expense): Movement(amount, origin, destination)
