@@ -1,6 +1,7 @@
 package ar.com.kairoslp.tripter.restful.controller
 
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
+import ar.com.kairoslp.tripter.restful.request.ExpenseUserPaymentRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
 import ar.com.kairoslp.tripter.service.TripService
 import ar.com.kairoslp.tripter.service.UserService
@@ -30,5 +31,10 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
     @GetMapping("/{tripId}/debt")
     fun getDebts(@PathVariable tripId: Long): List<DebtResponse> {
         return this.tripService.calculateDebts(tripId, this.userService.getLoggedInUser().id!!)
+    }
+
+    @PostMapping("/{tripId}/loan")
+    fun addLoan(@PathVariable tripId: Long, @RequestBody loanRequest: ExpenseUserPaymentRequest) {
+        return this.tripService.addLoan(tripId, loanRequest, this.userService.getLoggedInUser().id!!)
     }
 }

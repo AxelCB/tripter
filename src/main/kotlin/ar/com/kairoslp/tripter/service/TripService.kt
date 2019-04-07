@@ -3,13 +3,16 @@ package ar.com.kairoslp.tripter.service
 import ar.com.kairoslp.tripter.model.Trip
 import ar.com.kairoslp.tripter.model.User
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
-import ar.com.kairoslp.tripter.model.account.Movement
-import ar.com.kairoslp.tripter.model.expense.*
+import ar.com.kairoslp.tripter.model.expense.Expense
+import ar.com.kairoslp.tripter.model.account.Loan
+import ar.com.kairoslp.tripter.model.expense.ExpenseEquallySplitStrategy
+import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByPercentagesStrategy
+import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByValuesStrategy
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
+import ar.com.kairoslp.tripter.restful.request.ExpenseUserPaymentRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 import javax.transaction.Transactional
 
 @Service
@@ -80,5 +83,16 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
             debtResponseList.add(DebtResponse(it.key!!.user.id!!, it.key!!.user.fullName, debtAmount))
         }
         return debtResponseList
+    }
+
+    @Transactional
+    fun addLoan(tripId: Long, loanRequest: ExpenseUserPaymentRequest, userId: Long) {
+        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
+        val trip: Trip = loggedInUser.getTripById(tripId)
+
+        val loggedInUserAccount = loggedInUser.getAccountFor(trip)
+        loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, trip.userAccountsForTrip.single { userAccountForTrip ->
+            userAccountForTrip.user.id == loanRequest.userId
+        } ))
     }
 }
