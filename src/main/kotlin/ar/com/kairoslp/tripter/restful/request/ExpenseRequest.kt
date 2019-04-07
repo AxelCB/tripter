@@ -1,6 +1,5 @@
 package ar.com.kairoslp.tripter.restful.request
 
-import ar.com.kairoslp.tripter.model.expense.ExpenseSplitStrategyEnum
 import java.io.Serializable
 import java.math.BigDecimal
 
