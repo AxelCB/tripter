@@ -2,9 +2,10 @@ package ar.com.kairoslp.tripter.service
 
 import ar.com.kairoslp.tripter.model.Trip
 import ar.com.kairoslp.tripter.model.User
+import ar.com.kairoslp.tripter.model.account.DebtPayment
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
-import ar.com.kairoslp.tripter.model.expense.Expense
 import ar.com.kairoslp.tripter.model.account.Loan
+import ar.com.kairoslp.tripter.model.expense.Expense
 import ar.com.kairoslp.tripter.model.expense.ExpenseEquallySplitStrategy
 import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByPercentagesStrategy
 import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByValuesStrategy
@@ -92,6 +93,17 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
 
         val loggedInUserAccount = loggedInUser.getAccountFor(trip)
         loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, trip.userAccountsForTrip.single { userAccountForTrip ->
+            userAccountForTrip.user.id == loanRequest.userId
+        } ))
+    }
+
+    @Transactional
+    fun addDebtPayment(tripId: Long, loanRequest: ExpenseUserPaymentRequest, userId: Long) {
+        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
+        val trip: Trip = loggedInUser.getTripById(tripId)
+
+        val loggedInUserAccount = loggedInUser.getAccountFor(trip)
+        loggedInUserAccount.addMovement(DebtPayment(loanRequest.amount, loggedInUserAccount, trip.userAccountsForTrip.single { userAccountForTrip ->
             userAccountForTrip.user.id == loanRequest.userId
         } ))
     }

@@ -37,4 +37,9 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
     fun addLoan(@PathVariable tripId: Long, @RequestBody loanRequest: ExpenseUserPaymentRequest) {
         return this.tripService.addLoan(tripId, loanRequest, this.userService.getLoggedInUser().id!!)
     }
+
+    @PostMapping("/{tripId}/debtPayment")
+    fun addDebtPayment(@PathVariable tripId: Long, @RequestBody loanRequest: ExpenseUserPaymentRequest) {
+        return this.tripService.addDebtPayment(tripId, loanRequest, this.userService.getLoggedInUser().id!!)
+    }
 }
