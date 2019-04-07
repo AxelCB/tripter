@@ -58,8 +58,8 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
         val userAccount = loggedInUser.getAccountFor(trip)
         val debtResponseList = ArrayList<DebtResponse>()
 
-        val outgoingMovementsByDestination = userAccount.outgoingMovements.groupBy { it.destination }
-        val incomingMovementsByOrigin = userAccount.incomingMovements.filter { it !is ExpensePayment }.groupBy { it.origin }.toMutableMap()
+        val outgoingMovementsByDestination = userAccount.outgoingMovements.filter { it.destination != it.origin } .groupBy { it.destination }
+        val incomingMovementsByOrigin = userAccount.incomingMovements.filter { it !is ExpensePayment && it.destination != it.origin }.groupBy { it.origin }.toMutableMap()
 
         outgoingMovementsByDestination.forEach {
             var debtAmount = it.value.map { it.amount }.reduce { acc, movementAmount -> acc.add(movementAmount) }
