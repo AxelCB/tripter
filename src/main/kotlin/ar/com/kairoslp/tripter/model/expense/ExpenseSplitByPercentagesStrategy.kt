@@ -11,7 +11,7 @@ class ExpenseSplitByPercentagesStrategy: ExpenseSplitStrategy {
         if (this.percentagesByUser.map { it.percentage }.reduce { x, y -> x.add(y) } != BigDecimal.ONE) return
         users.forEach {user ->
             val userAccount = user.getAccountFor(expense.trip)
-            val percentageByUser = this.percentagesByUser.filter { percentageByUser -> percentageByUser.user == user }.first()
+            val percentageByUser = this.percentagesByUser.first { percentageByUser -> percentageByUser.user == user }
             val cost: BigDecimal = expense.cost.multiply(percentageByUser.percentage)
             val expenseDebt = ExpenseDebt(cost, userAccount, expense)
             expense.addExpenseDebt(expenseDebt)

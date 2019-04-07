@@ -3,10 +3,12 @@ package ar.com.kairoslp.tripter.model
 import ar.com.kairoslp.tripter.model.account.UserAccountForTrip
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.Serializable
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
 
 @Entity
+@Table(name = "TRIPTER_USER")
 class User(var firstName: String,
            var lastName: String,
            @Column(unique = true) var email: String,
@@ -19,9 +21,9 @@ class User(var firstName: String,
         return this.userAccountsForTrips.map(UserAccountForTrip::trip)
     }
 
-    fun organizeNewTrip(title: String, startDate: Date, endDate: Date? = null): Trip {
+    fun organizeNewTrip(title: String, startDate: LocalDate, endDate: LocalDate? = null): Trip {
         val trip = Trip(title, startDate, this, endDate)
-        trip.addTraveler(this)
+            trip.addTraveler(this)
         return trip
     }
 
@@ -39,11 +41,11 @@ class User(var firstName: String,
     @Throws
     fun getAccountFor(trip: Trip): UserAccountForTrip {
         //Might throw if user is not a traveler of the provided trip
-        return this.userAccountsForTrips.filter { userAccountForTrip -> userAccountForTrip.trip.equals(trip) }.single()
+        return this.userAccountsForTrips.single { userAccountForTrip -> userAccountForTrip.trip == trip }
     }
 
     fun getTripById(tripId: Long): Trip {
-        return this.getTrips().filter { trip -> trip.id == tripId }.first()
+        return this.getTrips().first { trip -> trip.id == tripId }
     }
 
     override fun equals(other: Any?): Boolean {

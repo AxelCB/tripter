@@ -12,8 +12,6 @@ class ExpenseEquallySplitStrategy: ExpenseSplitStrategy {
             val expenseDebt = ExpenseDebt(expense.cost.divide(BigDecimal(users.size), BigDecimal.ROUND_HALF_EVEN), userAccount, expense)
             expense.addExpenseDebt(expenseDebt)
             userAccount.addMovement(expenseDebt)
-
         }
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 class UserAccountForTrip(@ManyToOne var user: User,
-                         @ManyToOne var trip: Trip,
+                         @ManyToOne(cascade = [(CascadeType.ALL)]) var trip: Trip,
                          var balance: BigDecimal = BigDecimal.ZERO,
                          @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "origin") var outgoingMovements: MutableList<Movement> = ArrayList(),
                          @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "destination") var incomingMovements: MutableList<Movement> = ArrayList(),

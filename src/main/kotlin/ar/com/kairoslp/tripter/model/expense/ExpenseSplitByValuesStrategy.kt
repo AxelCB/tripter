@@ -10,7 +10,7 @@ class ExpenseSplitByValuesStrategy: ExpenseSplitStrategy {
         if (this.valuesByUser.map { it.value }.reduce { x, y -> x.add(y) } != expense.cost) return
         users.forEach {user ->
             val userAccount = user.getAccountFor(expense.trip)
-            val valueByUser = this.valuesByUser.filter { valueByUser -> valueByUser.user == user }.first()
+            val valueByUser = this.valuesByUser.first { valueByUser -> valueByUser.user == user }
             val expenseDebt = ExpenseDebt(valueByUser.value, userAccount, expense)
             expense.addExpenseDebt(expenseDebt)
             userAccount.addMovement(expenseDebt)
