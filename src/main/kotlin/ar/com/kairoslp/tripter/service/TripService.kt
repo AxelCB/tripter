@@ -5,10 +5,7 @@ import ar.com.kairoslp.tripter.model.User
 import ar.com.kairoslp.tripter.model.account.DebtPayment
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
 import ar.com.kairoslp.tripter.model.account.Loan
-import ar.com.kairoslp.tripter.model.expense.Expense
-import ar.com.kairoslp.tripter.model.expense.ExpenseEquallySplitStrategy
-import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByPercentagesStrategy
-import ar.com.kairoslp.tripter.model.expense.ExpenseSplitByValuesStrategy
+import ar.com.kairoslp.tripter.model.expense.*
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
 import ar.com.kairoslp.tripter.restful.request.UserAmountRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
@@ -34,9 +31,7 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
         val expense = Expense(expenseRequest, trip)
 
         for (expenseUserPayment in expenseRequest.payments) {
-            val userAccount = trip.userAccountsForTrip.single { userAccountForTrip ->
-                userAccountForTrip.user.id == expenseUserPayment.userId
-            }
+            val userAccount = trip.getTravelerAccountByUserId(expenseUserPayment.userId)
             expense.payments.add(ExpensePayment(expenseUserPayment.amount, userAccount, expense))
         }
         val involvedUsers = trip.getTravelers().filter { user -> expenseRequest.usersIds.contains(user.id) }
@@ -48,9 +43,23 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
         when (expense.strategy) {
             is ExpenseEquallySplitStrategy -> (expense.strategy as ExpenseEquallySplitStrategy).users = involvedUsers
             //TODO set proper input
-            is ExpenseSplitByValuesStrategy -> (expense.strategy as ExpenseSplitByValuesStrategy).valuesByUser = ArrayList()
+            is ExpenseSplitByValuesStrategy -> {
+                if (expenseRequest.amountPerUser != null) {
+                    val expenseStrategy = (expense.strategy as ExpenseSplitByValuesStrategy)
+                    expenseStrategy.valuesByUser = expenseRequest.amountPerUser!!.map { ValueByUser(it.amount, trip.getTravelerAccountByUserId(it.userId).user) }
+                } else {
+                    //TODO throw error! Request must contain amountPerUser array
+                }
+            }
             //TODO set proper input
-            is ExpenseSplitByPercentagesStrategy -> (expense.strategy as ExpenseSplitByPercentagesStrategy).percentagesByUser = ArrayList()
+            is ExpenseSplitByPercentagesStrategy -> {
+                if (expenseRequest.amountPerUser != null) {
+                    val expenseStrategy = (expense.strategy as ExpenseSplitByPercentagesStrategy)
+                    expenseStrategy.percentagesByUser = expenseRequest.amountPerUser!!.map { PercentageByUser(it.amount, trip.getTravelerAccountByUserId(it.userId).user) }
+                } else {
+                    //TODO throw error! Request must contain amountPerUser array
+                }
+            }
         }
         expense.splitBetween(involvedUsers)
     }
@@ -92,19 +101,15 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
         val trip: Trip = loggedInUser.getTripById(tripId)
 
         val loggedInUserAccount = loggedInUser.getAccountFor(trip)
-        loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, trip.userAccountsForTrip.single { userAccountForTrip ->
-            userAccountForTrip.user.id == loanRequest.userId
-        } ))
+        loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, trip.getTravelerAccountByUserId(loanRequest.userId)))
     }
 
     @Transactional
-    fun addDebtPayment(tripId: Long, loanRequest: UserAmountRequest, userId: Long) {
+    fun addDebtPayment(tripId: Long, debtPaymentRequest: UserAmountRequest, userId: Long) {
         val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
         val trip: Trip = loggedInUser.getTripById(tripId)
 
         val loggedInUserAccount = loggedInUser.getAccountFor(trip)
-        loggedInUserAccount.addMovement(DebtPayment(loanRequest.amount, loggedInUserAccount, trip.userAccountsForTrip.single { userAccountForTrip ->
-            userAccountForTrip.user.id == loanRequest.userId
-        } ))
+        loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, trip.getTravelerAccountByUserId(debtPaymentRequest.userId)))
     }
 }
