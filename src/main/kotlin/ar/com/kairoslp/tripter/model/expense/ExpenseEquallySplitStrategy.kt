@@ -1,17 +1,16 @@
 package ar.com.kairoslp.tripter.model.expense
 
 import ar.com.kairoslp.tripter.model.User
-import ar.com.kairoslp.tripter.model.account.ExpenseDebt
 import java.math.BigDecimal
 
-class ExpenseEquallySplitStrategy: ExpenseSplitStrategy {
+class ExpenseEquallySplitStrategy: ExpenseSplitStrategy() {
+    var users: List<User> = ArrayList()
 
-    override fun splitExpenseBetween(expense: Expense, users: List<User>) {
-        users.forEach {
-            val userAccount = it.getAccountFor(expense.trip)
-            val expenseDebt = ExpenseDebt(expense.cost.divide(BigDecimal(users.size), BigDecimal.ROUND_HALF_EVEN), userAccount, expense)
-            expense.addExpenseDebt(expenseDebt)
-            userAccount.addMovement(expenseDebt)
-        }
+    override fun validate(expense: Expense): Boolean {
+        return true
+    }
+
+    override fun calculateDebtAmountFor(cost: BigDecimal, user: User): BigDecimal {
+        return cost.divide(BigDecimal(users.size), BigDecimal.ROUND_HALF_EVEN)
     }
 }

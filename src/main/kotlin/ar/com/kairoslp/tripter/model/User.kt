@@ -17,6 +17,8 @@ class User(var firstName: String,
            @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "user") var userAccountsForTrips: MutableList<UserAccountForTrip> = ArrayList(),
            @Column(unique = true) var username: String = email): Serializable {
 
+    val fullName: String get() = "$firstName $lastName"
+
     fun getTrips(): List<Trip> {
         return this.userAccountsForTrips.map(UserAccountForTrip::trip)
     }
