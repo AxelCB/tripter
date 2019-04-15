@@ -10,7 +10,8 @@ import javax.persistence.*
 class TravelerNetwork(@Id @GeneratedValue val id: Long? = null,
                       @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true)
                       @JoinColumn(name = "traveler_network_id")
-                      var users: MutableList<User> = ArrayList()): Serializable {
+                      var users: MutableList<User> = ArrayList(),
+                      @Version val version: Long? = 0L): Serializable {
 
     fun addUser(user: User) {
         this.users.add(user)

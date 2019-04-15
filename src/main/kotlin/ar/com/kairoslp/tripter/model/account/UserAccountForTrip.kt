@@ -11,7 +11,8 @@ class UserAccountForTrip(@ManyToOne var user: User,
                          var balance: BigDecimal = BigDecimal.ZERO,
                          @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "origin") var outgoingMovements: MutableList<Movement> = ArrayList(),
                          @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "destination") var incomingMovements: MutableList<Movement> = ArrayList(),
-                         @Id @GeneratedValue val id: Long? = null) {
+                         @Id @GeneratedValue val id: Long? = null,
+                         @Version val version: Long? = 0L) {
 
     fun addMovement(movement: Movement) {
         when {
