@@ -103,11 +103,8 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
 
     @Transactional
     fun addLoan(tripId: Long, loanRequest: UserAmountRequest, userId: Long) {
-        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
-        val trip: Trip = loggedInUser.getTripById(tripId)
-
-        val loggedInUserAccount = loggedInUser.getAccountFor(trip)
-        loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, trip.getTravelerAccountByUserId(loanRequest.userId)))
+        val loggedInUserAccount: UserAccountForTrip = userAccountForTripRepository.findByUserIdAndTripId(userId, tripId)!!
+        loggedInUserAccount.addMovement(Loan(loanRequest.amount, loggedInUserAccount, userAccountForTripRepository.findByUserIdAndTripId(loanRequest.userId, tripId)!!))
     }
 
     @Transactional
