@@ -6,6 +6,8 @@ import ar.com.kairoslp.tripter.model.account.DebtPayment
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
 import ar.com.kairoslp.tripter.model.account.Loan
 import ar.com.kairoslp.tripter.model.expense.*
+import ar.com.kairoslp.tripter.persistence.repository.TripRepository
+import ar.com.kairoslp.tripter.persistence.repository.UserRepository
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
 import ar.com.kairoslp.tripter.restful.request.UserAmountRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
@@ -14,13 +16,13 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class TripService(@Autowired val travelerNetworkService: TravelerNetworkService) {
+class TripService(@Autowired val travelerNetworkService: TravelerNetworkService, @Autowired val userRepository: UserRepository, @Autowired val tripRepository: TripRepository) {
 
     @Transactional
     fun addTravelerToTrip(userId: Long, tripId: Long, travelerId: Long) {
-        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
-        val trip: Trip = loggedInUser.getTripById(tripId)
-        val traveler = travelerNetworkService.findTravelerNetwork().getUserById(travelerId)
+        val loggedInUser: User =  userRepository.findById(userId)
+        val trip: Trip = tripRepository.findById(tripId)
+        val traveler = userRepository.findById(travelerId)
         loggedInUser.addTravelerToTrip(traveler, trip)
     }
 
@@ -42,7 +44,6 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService)
 
         when (expense.strategy) {
             is ExpenseEquallySplitStrategy -> (expense.strategy as ExpenseEquallySplitStrategy).users = involvedUsers
-            //TODO set proper input
             is ExpenseSplitByValuesStrategy -> {
                 if (expenseRequest.amountPerUser != null) {
                     val expenseStrategy = (expense.strategy as ExpenseSplitByValuesStrategy)

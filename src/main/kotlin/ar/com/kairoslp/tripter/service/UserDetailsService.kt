@@ -3,7 +3,7 @@ package ar.com.kairoslp.tripter.service
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
-import ar.com.kairoslp.tripter.persistence.repository.UserRepository
+import ar.com.kairoslp.tripter.persistence.repository.spring.UserSpringRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 
 
 @Service
-class UserDetailsService(@Autowired private val userRepository: UserRepository): UserDetailsService {
+class UserDetailsService(@Autowired private val userRepository: UserSpringRepository): UserDetailsService {
 
     @Transactional
     override fun loadUserByUsername(username: String): UserDetails {
