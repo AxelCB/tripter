@@ -36,7 +36,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
     fun getLoggedInUser(): User {
         val userDetails = SecurityContextHolder.getContext().authentication.principal
         if (userDetails is UserDetails) {
-            val loggedInUser: User? = userRepository.findByUsername(userDetails.username)
+            val loggedInUser: User? = this.userRepository.findByUsername(userDetails.username)
             if (loggedInUser != null && loggedInUser.id == null) {
                 throw MissingServletRequestParameterException("Logged in user ID", "Long")
             }

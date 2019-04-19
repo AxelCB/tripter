@@ -1,7 +1,7 @@
 package ar.com.kairoslp.tripter.service
 
 import ar.com.kairoslp.tripter.model.TravelerNetwork
-import ar.com.kairoslp.tripter.persistence.repository.TravelerNetworkRepository
+import ar.com.kairoslp.tripter.persistence.repository.spring.TravelerNetworkSpringRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.annotation.Scope
@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 
 @Component
 @Scope("singleton")
-class TravelerNetworkService(@Autowired var travelerNetworkRepository: TravelerNetworkRepository) {
+class TravelerNetworkService(@Autowired var travelerNetworkSpringRepository: TravelerNetworkSpringRepository) {
 
     var travelerNetwork: TravelerNetwork? = null
     var travelerNetworkId: Long? = null
@@ -24,11 +24,11 @@ class TravelerNetworkService(@Autowired var travelerNetworkRepository: TravelerN
     @EventListener(ApplicationReadyEvent::class)
     @Transactional
     fun initializeTravelerNetwork() {
-        val travelerNetworkAmount = this.travelerNetworkRepository.count()
+        val travelerNetworkAmount = this.travelerNetworkSpringRepository.count()
         if (travelerNetworkAmount == 1L) {
-            travelerNetwork = this.travelerNetworkRepository.findAll()[0]
+            travelerNetwork = this.travelerNetworkSpringRepository.findAll()[0]
         } else if (travelerNetworkAmount == 0L) {
-            travelerNetwork = this.travelerNetworkRepository.save(TravelerNetwork())
+            travelerNetwork = this.travelerNetworkSpringRepository.save(TravelerNetwork())
         } else {
             System.out.println("There should be only one traveler network!!")
             //TODO throw error
@@ -38,6 +38,6 @@ class TravelerNetworkService(@Autowired var travelerNetworkRepository: TravelerN
 
     @Transactional
     fun findTravelerNetwork(): TravelerNetwork {
-        return travelerNetworkRepository.getOne(travelerNetworkId!!)
+        return travelerNetworkSpringRepository.getOne(travelerNetworkId!!)
     }
 }
