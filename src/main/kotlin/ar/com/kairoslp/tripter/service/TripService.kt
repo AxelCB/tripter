@@ -5,8 +5,10 @@ import ar.com.kairoslp.tripter.model.User
 import ar.com.kairoslp.tripter.model.account.DebtPayment
 import ar.com.kairoslp.tripter.model.account.ExpensePayment
 import ar.com.kairoslp.tripter.model.account.Loan
+import ar.com.kairoslp.tripter.model.account.UserAccountForTrip
 import ar.com.kairoslp.tripter.model.expense.*
 import ar.com.kairoslp.tripter.persistence.repository.TripRepository
+import ar.com.kairoslp.tripter.persistence.repository.UserAccountForTripRepository
 import ar.com.kairoslp.tripter.persistence.repository.UserRepository
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
 import ar.com.kairoslp.tripter.restful.request.UserAmountRequest
@@ -16,7 +18,10 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class TripService(@Autowired val travelerNetworkService: TravelerNetworkService, @Autowired val userRepository: UserRepository, @Autowired val tripRepository: TripRepository) {
+class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
+                  @Autowired val userRepository: UserRepository,
+                  @Autowired val tripRepository: TripRepository,
+                  @Autowired val userAccountForTripRepository: UserAccountForTripRepository) {
 
     @Transactional
     fun addTravelerToTrip(userId: Long, tripId: Long, travelerId: Long) {
@@ -107,10 +112,7 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
 
     @Transactional
     fun addDebtPayment(tripId: Long, debtPaymentRequest: UserAmountRequest, userId: Long) {
-        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
-        val trip: Trip = loggedInUser.getTripById(tripId)
-
-        val loggedInUserAccount = loggedInUser.getAccountFor(trip)
-        loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, trip.getTravelerAccountByUserId(debtPaymentRequest.userId)))
+        val loggedInUserAccount: UserAccountForTrip = userAccountForTripRepository.findByUserIdAndTripId(userId, tripId)!!
+        loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, userAccountForTripRepository.findByUserIdAndTripId(debtPaymentRequest.userId, tripId)!!))
     }
 }

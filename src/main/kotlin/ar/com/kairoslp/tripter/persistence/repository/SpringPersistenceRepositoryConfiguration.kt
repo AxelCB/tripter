@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class SpringPersistenceRepositoryConfiguration(@Autowired val userSpringRepository: UserSpringRepository, @Autowired val tripSpringRepository: TripSpringRepository) {
+class SpringPersistenceRepositoryConfiguration(@Autowired val userSpringRepository: UserSpringRepository,
+                                               @Autowired val tripSpringRepository: TripSpringRepository,
+                                               @Autowired val userAccountForTripRepository: UserAccountForTripRepository) {
 
     @Bean
     fun userRepository(): UserRepository {
@@ -17,5 +19,10 @@ class SpringPersistenceRepositoryConfiguration(@Autowired val userSpringReposito
     @Bean
     fun tripRepository(): TripRepository {
         return this.tripSpringRepository
+    }
+
+    @Bean
+    fun userAccountForTripRepository(): UserAccountForTripRepository {
+        return this.userAccountForTripRepository
     }
 }
