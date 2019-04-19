@@ -27,7 +27,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
     @Transactional
     fun organizeTrip(userId: Long, title: String,
                      startDate: LocalDate, endDate: LocalDate?): Trip {
-        val user: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
+        val user: User = userRepository.findById(userId)
         return user.organizeNewTrip(title, startDate, endDate)
     }
 
