@@ -20,8 +20,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException
 import javax.transaction.Transactional
 
 @Service
-class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
-                  @Autowired val userRepository: UserRepository,
+class TripService(@Autowired val userRepository: UserRepository,
                   @Autowired val tripRepository: TripRepository,
                   @Autowired val userAccountForTripRepository: UserAccountForTripRepository) {
 
@@ -81,16 +80,14 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
 
     @Transactional
     fun calculateDebts(tripId: Long, userId: Long): List<DebtResponse> {
-        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
-        val trip: Trip = loggedInUser.getTripById(tripId)
-        val userAccount = loggedInUser.getAccountFor(trip)
+        val userAccount = userAccountForTripRepository.findByUserIdAndTripId(userId, tripId)!!
         val debtResponseList = ArrayList<DebtResponse>()
 
         val outgoingMovementsByDestination = userAccount.outgoingMovements.filter { it.destination != it.origin } .groupBy { it.destination }
         val incomingMovementsByOrigin = userAccount.incomingMovements.filter { it !is ExpensePayment && it.destination != it.origin }.groupBy { it.origin }.toMutableMap()
 
         outgoingMovementsByDestination.forEach {
-            var debtAmount = it.value.map { it.amount }.reduce { acc, movementAmount -> acc.add(movementAmount) }
+            var debtAmount = it.value.map { movement -> movement.amount }.reduce { acc, movementAmount -> acc.add(movementAmount) }
             if(incomingMovementsByOrigin[it.key] != null && incomingMovementsByOrigin.getValue(it.key).isNotEmpty()) {
                 debtAmount = debtAmount.subtract(
                     incomingMovementsByOrigin.getValue(it.key)
