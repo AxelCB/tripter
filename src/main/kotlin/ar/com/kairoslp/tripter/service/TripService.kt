@@ -13,8 +13,10 @@ import ar.com.kairoslp.tripter.persistence.repository.UserRepository
 import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
 import ar.com.kairoslp.tripter.restful.request.UserAmountRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
+import ar.com.kairoslp.tripter.restful.response.UserNotTravelerOfTripException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.MissingServletRequestParameterException
 import javax.transaction.Transactional
 
 @Service
@@ -31,20 +33,28 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
         loggedInUser.addTravelerToTrip(traveler, trip)
     }
 
+    @Throws
     @Transactional
     fun addExpense(tripId: Long, expenseRequest: ExpenseRequest, userId: Long) {
-        val loggedInUser: User = travelerNetworkService.findTravelerNetwork().getUserById(userId)
-        val trip: Trip = loggedInUser.getTripById(tripId)
+        val trip: Trip = tripRepository.findById(tripId)
         val expense = Expense(expenseRequest, trip)
 
         for (expenseUserPayment in expenseRequest.payments) {
-            val userAccount = trip.getTravelerAccountByUserId(expenseUserPayment.userId)
+            val userAccount = userAccountForTripRepository.findByUserIdAndTripId(expenseUserPayment.userId, tripId)!!
             expense.payments.add(ExpensePayment(expenseUserPayment.amount, userAccount, expense))
         }
         val involvedUsers = trip.getTravelers().filter { user -> expenseRequest.usersIds.contains(user.id) }
-        if (involvedUsers.size != expenseRequest.usersIds.size) {
-            //TODO Throw error! At least one of the given users is no a traveler of this trip
-            return
+        if (involvedUsers.size < expenseRequest.usersIds.size) {
+            val notTravelers: List<Long> = (involvedUsers.map { it.id } + expenseRequest.usersIds)
+                    .groupBy { it }
+                    .filter { it.value.size == 1 }
+                    .flatMap { it.value }
+                    .requireNoNulls()
+            if (notTravelers.size > 1) {
+                throw UserNotTravelerOfTripException(notTravelers.first(),tripId)
+            } else {
+                throw UserNotTravelerOfTripException(notTravelers, tripId)
+            }
         }
 
         when (expense.strategy) {
@@ -54,16 +64,15 @@ class TripService(@Autowired val travelerNetworkService: TravelerNetworkService,
                     val expenseStrategy = (expense.strategy as ExpenseSplitByValuesStrategy)
                     expenseStrategy.valuesByUser = expenseRequest.amountPerUser!!.map { ValueByUser(it.amount, trip.getTravelerAccountByUserId(it.userId).user) }
                 } else {
-                    //TODO throw error! Request must contain amountPerUser array
+                    throw MissingServletRequestParameterException("amountPerUser","UserAmountRequest(userId, amount)")
                 }
             }
-            //TODO set proper input
             is ExpenseSplitByPercentagesStrategy -> {
                 if (expenseRequest.amountPerUser != null) {
                     val expenseStrategy = (expense.strategy as ExpenseSplitByPercentagesStrategy)
                     expenseStrategy.percentagesByUser = expenseRequest.amountPerUser!!.map { PercentageByUser(it.amount, trip.getTravelerAccountByUserId(it.userId).user) }
                 } else {
-                    //TODO throw error! Request must contain amountPerUser array
+                    throw MissingServletRequestParameterException("amountPerUser","UserAmountRequest(userId, amount)")
                 }
             }
         }
