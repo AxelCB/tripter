@@ -14,6 +14,7 @@ class User(var firstName: String,
            @Column(unique = true) var email: String,
            @JsonIgnore var password: String,
            @Id @GeneratedValue val id: Long? = null,
+           @Version val version: Long? = 0L,
            @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "user") var userAccountsForTrips: MutableList<UserAccountForTrip> = ArrayList(),
            @Column(unique = true) var username: String = email): Serializable {
 

@@ -13,7 +13,8 @@ class Trip(var title: String,
            var endDate: LocalDate? = null,
            @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "trip") var userAccountsForTrip: MutableList<UserAccountForTrip> = ArrayList(),
            @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true, mappedBy = "trip") var expenses: MutableList<Expense> = ArrayList(),
-           @Id @GeneratedValue val id: Long? = null) {
+           @Id @GeneratedValue val id: Long? = null,
+           @Version val version: Long? = 0L) {
 
     fun getTravelers(): List<User> {
         return this.userAccountsForTrip.map(UserAccountForTrip::user)

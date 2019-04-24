@@ -8,4 +8,5 @@ import javax.persistence.*
 abstract class Movement(var amount: BigDecimal,
                         @ManyToOne var origin: UserAccountForTrip? = null,
                         @ManyToOne var destination: UserAccountForTrip? = null,
-                        @Id @GeneratedValue val id: Long? = null)
+                        @Id @GeneratedValue val id: Long? = null,
+                        @Version val version: Long? = 0L)
