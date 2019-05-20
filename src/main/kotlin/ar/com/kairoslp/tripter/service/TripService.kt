@@ -34,10 +34,20 @@ class TripService(@Autowired val userRepository: UserRepository,
 
     @Throws
     @Transactional
-    fun addExpense(tripId: Long, expenseRequest: ExpenseRequest, userId: Long) {
+    fun addExpense(tripId: Long, tripVersion: Long, expenseRequest: ExpenseRequest, userId: Long) {
         val trip: Trip = tripRepository.findById(tripId)
         val expense = Expense(expenseRequest, trip)
 
+        if (tripVersion < trip.version!!) {
+            throw EntityNotLatestVersionException("trip")
+        }
+        
+        try {
+            trip.getTravelerAccountByUserId(userId)
+        } catch (e: Exception) {
+            throw UserNotTravelerOfTripException(userId, tripId)
+        }
+        
         for (expenseUserPayment in expenseRequest.payments) {
             val userAccount = userAccountForTripRepository.findByUserIdAndTripId(expenseUserPayment.userId, tripId)!!
             expense.payments.add(ExpensePayment(expenseUserPayment.amount, userAccount, expense))
@@ -119,3 +129,5 @@ class TripService(@Autowired val userRepository: UserRepository,
         loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, userAccountForTripRepository.findByUserIdAndTripId(debtPaymentRequest.userId, tripId)!!))
     }
 }
+
+class EntityNotLatestVersionException(entityName: String): Exception("The " + entityName + "you are trying to update is not on it's latest version.")

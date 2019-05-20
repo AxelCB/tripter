@@ -23,9 +23,9 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
         return this.tripService.addTravelerToTrip(this.userService.getLoggedInUser().id!!, tripId, travelerId)
     }
 
-    @PostMapping("/{tripId}/expense")
-    fun addExpense(@PathVariable tripId: Long, @RequestBody expenseRequest: ExpenseRequest) {
-        return this.tripService.addExpense(tripId, expenseRequest, this.userService.getLoggedInUser().id!!)
+    @PostMapping("/{tripId}/{version}/expense")
+    fun addExpense(@PathVariable tripId: Long, @PathVariable version: Long, @RequestBody expenseRequest: ExpenseRequest) {
+        return this.tripService.addExpense(tripId, version, expenseRequest, this.userService.getLoggedInUser().id!!)
     }
 
     @GetMapping("/{tripId}/debt")
