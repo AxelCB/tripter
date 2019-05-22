@@ -118,4 +118,20 @@ class TripService(@Autowired val userRepository: UserRepository,
         val loggedInUserAccount: UserAccountForTrip = userAccountForTripRepository.findByUserIdAndTripId(userId, tripId)!!
         loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, userAccountForTripRepository.findByUserIdAndTripId(debtPaymentRequest.userId, tripId)!!))
     }
+
+    @Transactional
+    fun removeTravelerFromTrip(userId: Long, tripId: Long, travelerId: Long) {
+        val loggedInUser: User =  userRepository.findById(userId)
+        val trip: Trip = tripRepository.findById(tripId)
+        val traveler = userRepository.findById(travelerId)
+        val travelerAccount = trip.getTravelerAccountByUserId(travelerId)
+        if (trip.organizer != loggedInUser) {
+            // Only organizer can remove travelers!
+        }
+        if (!travelerAccount.incomingMovements.isEmpty() ||
+            !travelerAccount.outgoingMovements.isEmpty()) {
+            // Can't remove a traveler if being involved in any expense
+        }
+        trip.removeTraveler(traveler)
+    }
 }

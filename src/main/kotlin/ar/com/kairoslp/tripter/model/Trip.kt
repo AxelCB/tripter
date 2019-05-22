@@ -36,4 +36,10 @@ class Trip(var title: String,
         }
     }
 
+    fun removeTraveler(traveler: User) {
+        val travelerAccount = getTravelerAccountByUserId(traveler.id!!)
+        traveler.userAccountsForTrips.remove(travelerAccount)
+        userAccountsForTrip.remove(travelerAccount)
+    }
+
 }
