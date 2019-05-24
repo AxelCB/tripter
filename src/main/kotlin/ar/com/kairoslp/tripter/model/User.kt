@@ -2,6 +2,7 @@ package ar.com.kairoslp.tripter.model
 
 import ar.com.kairoslp.tripter.model.account.UserAccountForTrip
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.springframework.security.access.AccessDeniedException
 import java.io.Serializable
 import java.time.LocalDate
 import java.util.*
@@ -35,9 +36,12 @@ class User(var firstName: String,
         this.userAccountsForTrips.add(userAccountForTrip)
     }
 
+    @Throws(AccessDeniedException::class)
     fun addTravelerToTrip(user: User, trip: Trip) {
         if (trip.organizer == this) {
             trip.addTraveler(user)
+        } else {
+            throw AccessDeniedException("User must be organizer of trip ${trip.id} to be able to add travelers.")
         }
     }
 

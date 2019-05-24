@@ -16,8 +16,13 @@ import javax.transaction.Transactional
 @Service
 class UserService(@Autowired val travelerNetworkService: TravelerNetworkService, @Autowired val passwordEncoder: PasswordEncoder, @Autowired val userRepository: UserRepository) {
 
+    @Throws(ExistingUserWithEmailException::class)
     @Transactional
     fun register(firstName: String, lastName: String, email: String, password: String): User {
+        val existingUser: User? = this.userRepository.findByUsername(email)
+        if (existingUser != null) {
+            throw ExistingUserWithEmailException(email)
+        }
         val user = User(firstName, lastName, email, password)
         user.password = passwordEncoder.encode(password)
         travelerNetworkService.findTravelerNetwork().addUser(user)
@@ -32,7 +37,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
     }
 
     @Transactional
-    @Throws
+    @Throws(MissingServletRequestParameterException::class, AccessDeniedException::class)
     fun getLoggedInUser(): User {
         val userDetails = SecurityContextHolder.getContext().authentication.principal
         if (userDetails is UserDetails) {
@@ -46,3 +51,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
         throw AccessDeniedException("User is not logged in!")
     }
 }
+
+class ExistingUserWithEmailException(email: String): Exception("The email/username $email is already registered by another user.")
+
+
