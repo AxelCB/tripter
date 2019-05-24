@@ -17,25 +17,31 @@ import ar.com.kairoslp.tripter.restful.response.UserNotTravelerOfTripException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.MissingServletRequestParameterException
+import javax.persistence.EntityManager
+import javax.persistence.LockModeType
+import javax.persistence.PersistenceContext
 import javax.transaction.Transactional
 
 @Service
 class TripService(@Autowired val userRepository: UserRepository,
                   @Autowired val tripRepository: TripRepository,
-                  @Autowired val userAccountForTripRepository: UserAccountForTripRepository) {
+                  @Autowired val userAccountForTripRepository: UserAccountForTripRepository,
+                  @PersistenceContext val em: EntityManager) {
 
     @Transactional
     fun addTravelerToTrip(userId: Long, tripId: Long, travelerId: Long) {
         val loggedInUser: User =  userRepository.findById(userId)
         val trip: Trip = tripRepository.findById(tripId)
         val traveler = userRepository.findById(travelerId)
+        em.lock(trip, LockModeType.OPTIMISTIC_FORCE_INCREMENT)
         loggedInUser.addTravelerToTrip(traveler, trip)
     }
 
-    @Throws
+    @Throws(EntityNotLatestVersionException::class, UserNotTravelerOfTripException::class, MissingServletRequestParameterException::class)
     @Transactional
     fun addExpense(tripId: Long, tripVersion: Long, expenseRequest: ExpenseRequest, userId: Long) {
         val trip: Trip = tripRepository.findById(tripId)
+        em.lock(trip, LockModeType.OPTIMISTIC_FORCE_INCREMENT)
         val expense = Expense(expenseRequest, trip)
 
         if (tripVersion < trip.version!!) {
@@ -130,4 +136,4 @@ class TripService(@Autowired val userRepository: UserRepository,
     }
 }
 
-class EntityNotLatestVersionException(entityName: String): Exception("The " + entityName + "you are trying to update is not on it's latest version.")
+class EntityNotLatestVersionException(entityName: String): Exception("The " + entityName + " you are trying to update is not on it's latest version.")

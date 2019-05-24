@@ -16,6 +16,7 @@ import javax.transaction.Transactional
 @Service
 class UserService(@Autowired val travelerNetworkService: TravelerNetworkService, @Autowired val passwordEncoder: PasswordEncoder, @Autowired val userRepository: UserRepository) {
 
+    @Throws(ExistingUserWithEmailException::class)
     @Transactional
     fun register(firstName: String, lastName: String, email: String, password: String): User {
         val existingUser: User? = this.userRepository.findByUsername(email)
@@ -36,7 +37,7 @@ class UserService(@Autowired val travelerNetworkService: TravelerNetworkService,
     }
 
     @Transactional
-    @Throws
+    @Throws(MissingServletRequestParameterException::class, AccessDeniedException::class)
     fun getLoggedInUser(): User {
         val userDetails = SecurityContextHolder.getContext().authentication.principal
         if (userDetails is UserDetails) {
