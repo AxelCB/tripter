@@ -23,6 +23,11 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
         return this.tripService.addTravelerToTrip(this.userService.getLoggedInUser().id!!, tripId, travelerId)
     }
 
+    @DeleteMapping("/{tripId}/traveler/{travelerId}")
+    fun removeTraveler(@PathVariable tripId: Long, @PathVariable travelerId: Long) {
+        return this.tripService.removeTravelerFromTrip(this.userService.getLoggedInUser().id!!, tripId, travelerId)
+    }
+
     @PostMapping("/{tripId}/{version}/expense")
     fun addExpense(@PathVariable tripId: Long, @PathVariable version: Long, @RequestBody expenseRequest: ExpenseRequest) {
         return this.tripService.addExpense(tripId, version, expenseRequest, this.userService.getLoggedInUser().id!!)

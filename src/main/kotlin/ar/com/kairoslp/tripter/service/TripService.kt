@@ -14,7 +14,9 @@ import ar.com.kairoslp.tripter.restful.request.ExpenseRequest
 import ar.com.kairoslp.tripter.restful.request.UserAmountRequest
 import ar.com.kairoslp.tripter.restful.response.DebtResponse
 import ar.com.kairoslp.tripter.restful.response.UserNotTravelerOfTripException
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.MissingServletRequestParameterException
 import javax.persistence.EntityManager
@@ -28,6 +30,7 @@ class TripService(@Autowired val userRepository: UserRepository,
                   @Autowired val userAccountForTripRepository: UserAccountForTripRepository,
                   @PersistenceContext val em: EntityManager) {
 
+    @Throws(AccessDeniedException::class)
     @Transactional
     fun addTravelerToTrip(userId: Long, tripId: Long, travelerId: Long) {
         val loggedInUser: User =  userRepository.findById(userId)
@@ -134,6 +137,43 @@ class TripService(@Autowired val userRepository: UserRepository,
         val loggedInUserAccount: UserAccountForTrip = userAccountForTripRepository.findByUserIdAndTripId(userId, tripId)!!
         loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, userAccountForTripRepository.findByUserIdAndTripId(debtPaymentRequest.userId, tripId)!!))
     }
+
+    @Throws(AccessDeniedException::class, UserNotTravelerOfTripException::class, EntityNotFoundException::class)
+    @Transactional
+    fun removeTravelerFromTrip(userId: Long, tripId: Long, travelerId: Long) {
+        val loggedInUser: User =  userRepository.findById(userId)
+        val trip: Trip
+        val traveler: User
+        try {
+            trip = tripRepository.findById(tripId)
+        } catch (e: EmptyResultDataAccessException) {
+            throw EntityNotFoundException(tripId, Trip::class.simpleName!!)
+        }
+        try {
+            traveler = userRepository.findById(travelerId)
+        } catch (e: EmptyResultDataAccessException) {
+            throw EntityNotFoundException(travelerId, User::class.simpleName!!)
+        }
+        val travelerAccount: UserAccountForTrip
+        try {
+            travelerAccount = trip.getTravelerAccountByUserId(travelerId)
+        } catch (e: NoSuchElementException) {
+            throw UserNotTravelerOfTripException(userId, tripId) 
+        }
+        
+        if (trip.organizer != loggedInUser) {
+            throw AccessDeniedException("User must be organizer of trip ${trip.id} to be able to remove travelers.")
+        }
+        if (travelerAccount.incomingMovements.isNotEmpty() || travelerAccount.outgoingMovements.isNotEmpty()) {
+            throw UserInvoledInMovementsException(userId, tripId)
+        }
+        trip.removeTraveler(traveler)
+    }
 }
 
-class EntityNotLatestVersionException(entityName: String): Exception("The " + entityName + " you are trying to update is not on it's latest version.")
+
+class EntityNotLatestVersionException(entityName: String): Exception("The $entityName you are trying to update is not on it's latest version.")
+
+class EntityNotFoundException(id: Long, entityName: String): Exception("No $entityName found with id $id .")
+
+class UserInvoledInMovementsException(userId: Long, tripId: Long): Exception("User with $userId already involed in movements in trip with id $tripId.")
