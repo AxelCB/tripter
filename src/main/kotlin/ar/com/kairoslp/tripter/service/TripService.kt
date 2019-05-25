@@ -165,7 +165,7 @@ class TripService(@Autowired val userRepository: UserRepository,
             throw AccessDeniedException("User must be organizer of trip ${trip.id} to be able to remove travelers.")
         }
         if (travelerAccount.incomingMovements.isNotEmpty() || travelerAccount.outgoingMovements.isNotEmpty()) {
-            throw UserNotTravelerOfTripException(userId, tripId)
+            throw UserInvoledInMovementsException(userId, tripId)
         }
         trip.removeTraveler(traveler)
     }
@@ -175,3 +175,5 @@ class TripService(@Autowired val userRepository: UserRepository,
 class EntityNotLatestVersionException(entityName: String): Exception("The $entityName you are trying to update is not on it's latest version.")
 
 class EntityNotFoundException(id: Long, entityName: String): Exception("No $entityName found with id $id .")
+
+class UserInvoledInMovementsException(userId: Long, tripId: Long): Exception("User with $userId already involed in movements in trip with id $tripId.")
