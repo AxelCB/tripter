@@ -154,7 +154,13 @@ class TripService(@Autowired val userRepository: UserRepository,
         } catch (e: EmptyResultDataAccessException) {
             throw EntityNotFoundException(travelerId, User::class.simpleName!!)
         }
-        val travelerAccount = trip.getTravelerAccountByUserId(travelerId)
+        val travelerAccount: UserAccountForTrip
+        try {
+            travelerAccount = trip.getTravelerAccountByUserId(travelerId)
+        } catch (e: NoSuchElementException) {
+            throw UserNotTravelerOfTripException(userId, tripId) 
+        }
+        
         if (trip.organizer != loggedInUser) {
             throw AccessDeniedException("User must be organizer of trip ${trip.id} to be able to remove travelers.")
         }
