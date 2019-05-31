@@ -138,7 +138,7 @@ class TripService(@Autowired val userRepository: UserRepository,
         loggedInUserAccount.addMovement(DebtPayment(debtPaymentRequest.amount, loggedInUserAccount, userAccountForTripRepository.findByUserIdAndTripId(debtPaymentRequest.userId, tripId)!!))
     }
 
-    @Throws(AccessDeniedException::class, UserNotTravelerOfTripException::class, EntityNotFoundException::class)
+    @Throws(AccessDeniedException::class, UserNotTravelerOfTripException::class, EntityNotFoundException::class, UserInvoledInMovementsException::class)
     @Transactional
     fun removeTravelerFromTrip(userId: Long, tripId: Long, travelerId: Long) {
         val loggedInUser: User =  userRepository.findById(userId)
