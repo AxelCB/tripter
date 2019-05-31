@@ -18,7 +18,7 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
         return this.userService.organizeTrip(this.userService.getLoggedInUser().id!!, title, startDate, endDate).id
     }
 
-    @PostMapping("/{tripId}/traveler")
+    @PutMapping("/{tripId}/traveler")
     fun addTraveler(@PathVariable tripId: Long, @RequestParam travelerId: Long) {
         return this.tripService.addTravelerToTrip(this.userService.getLoggedInUser().id!!, tripId, travelerId)
     }
@@ -28,7 +28,7 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
         return this.tripService.removeTravelerFromTrip(this.userService.getLoggedInUser().id!!, tripId, travelerId)
     }
 
-    @PostMapping("/{tripId}/{version}/expense")
+    @PutMapping("/{tripId}/{version}/expense")
     fun addExpense(@PathVariable tripId: Long, @PathVariable version: Long, @RequestBody expenseRequest: ExpenseRequest) {
         return this.tripService.addExpense(tripId, version, expenseRequest, this.userService.getLoggedInUser().id!!)
     }
@@ -38,12 +38,12 @@ class TripController(@Autowired val userService: UserService, @Autowired val tri
         return this.tripService.calculateDebts(tripId, this.userService.getLoggedInUser().id!!)
     }
 
-    @PostMapping("/{tripId}/loan")
+    @PutMapping("/{tripId}/loan")
     fun addLoan(@PathVariable tripId: Long, @RequestBody loanRequest: UserAmountRequest) {
         return this.tripService.addLoan(tripId, loanRequest, this.userService.getLoggedInUser().id!!)
     }
 
-    @PostMapping("/{tripId}/debtPayment")
+    @PutMapping("/{tripId}/debtPayment")
     fun addDebtPayment(@PathVariable tripId: Long, @RequestBody loanRequest: UserAmountRequest) {
         return this.tripService.addDebtPayment(tripId, loanRequest, this.userService.getLoggedInUser().id!!)
     }
